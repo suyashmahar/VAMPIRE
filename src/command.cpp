@@ -54,6 +54,21 @@ void Command::setType(CommandType type) {
     Command::type = type;
 }
 
+std::string Command::to_string() const {
+    std::stringstream ss;
+    ss << "type: " << commandString[int(this->type)]
+         << ", issueTime: " << this->issueTime
+         << ", finishTime: " << this->finishTime
+         << ", add: " << add.to_string()
+         << ", data: " << std::hex;
+
+    for (int i = 0; i < 16; i++) {
+        ss << this->data[i];
+    }
+
+    ss << std::dec;
+    return ss.str();
+}
 
 std::ostream& operator<<(std::ostream& ostr, CommandType& cmdType) {
     ostr << commandString[static_cast<int>(cmdType)];
@@ -61,17 +76,5 @@ std::ostream& operator<<(std::ostream& ostr, CommandType& cmdType) {
 
 /* Outputs all the details of a command to an ostream object */
 std::ostream& operator<<(std::ostream& ostr, Command& cmd) {
-    std::stringstream ss;
-    ostr << "type: " << cmd.type
-         << ", issueTime: " << cmd.issueTime
-         << ", finishTime: " << cmd.finishTime
-         << ", add: " << cmd.add
-         << ", data: " << std::hex;
-
-    for (int i = 0; i < 16; i++) {
-        ostr << cmd.data[i];
-    }
-
-    ostr << std::dec << std::endl;
-    return ostr;
+    ostr << cmd.to_string() << std::endl;
 }

@@ -281,6 +281,33 @@ double_t Equations::calc_rd_wr_energy(CommandType request, MappedAdd add, unsign
     } else
         msg::error(FUNCTION_STR + ": Request is not an IO type");
 
+    // Update interleaving stats
+    if (request == CommandType::RD) {
+        if ((add.bank != IO_buffer.prevAdd.bank) && (add.col== IO_buffer.prevAdd.col)){ /* Bank Interleaving */
+            (*statistics.rdInterleavingCount)[int(CmdInterleaving::BANK)] +=1;
+        }
+        else if ((add.bank != IO_buffer.prevAdd.bank) && (add.col!= IO_buffer.prevAdd.col)){ /* Bank and Col Interleaving */
+            (*statistics.rdInterleavingCount)[int(CmdInterleaving::BOTH)] += 1;
+        }
+        else if ((add.bank == IO_buffer.prevAdd.bank) && (add.col!= IO_buffer.prevAdd.col)){ /* Col Interleaving */
+            (*statistics.rdInterleavingCount)[int(CmdInterleaving::COL)] += 1;
+        } else {
+            (*statistics.rdInterleavingCount)[int(CmdInterleaving::NONE)] += 1;
+        }
+    } else if (request == CommandType::WR) {
+        if ((add.bank != IO_buffer.prevAdd.bank) && (add.col== IO_buffer.prevAdd.col)){ /* Bank Interleaving */
+            (*statistics.wrInterleavingCount)[int(CmdInterleaving::BANK)] += 1;
+        }
+        else if ((add.bank != IO_buffer.prevAdd.bank) && (add.col!= IO_buffer.prevAdd.col)){ /* Bank and Col Interleaving */
+            (*statistics.wrInterleavingCount)[int(CmdInterleaving::BOTH)] += 1;
+        }
+        else if ((add.bank == IO_buffer.prevAdd.bank) && (add.col!= IO_buffer.prevAdd.col)){ /* Col Interleaving */
+            (*statistics.wrInterleavingCount)[int(CmdInterleaving::COL)] += 1;
+        } else {
+            (*statistics.wrInterleavingCount)[int(CmdInterleaving::NONE)] +=  1;
+        }
+    }
+
     assert(result != 0);
     return result;
 }

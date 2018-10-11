@@ -59,7 +59,7 @@ enum class StructVar        {NO, YES, MAX};
 enum class TraceType        {MEAN, DIST, WR, RD_WR, MAX};
 enum class Level            {CHANNEL, RANK, BANK, ROW, COLUMN, MAX};
 enum class State            {OPEN, CLOSE, MAX};
-enum class CmdInterleaving  {BANK, NONE, MAX};                          // Interleaving for RD/WR commands
+enum class CmdInterleaving  {BANK, BOTH, COL, NONE, MAX};                          // Interleaving for RD/WR commands
 enum class ParserType       {BINARY, ASCII, MAX};
 
 const std::string commandString[int(CommandType::MAX)] = {
@@ -74,6 +74,8 @@ const std::string vendorString[]        = {"A", "B", "C"};
 const std::string structVarString[]     = {"NO", "YES"};
 const std::string traceTypeString[]     = {"MEAN", "DIST", "WR", "RD_WR"};
 const std::string parserTypeString[]    = {"BINARY", "ASCII"};
+const std::string cmdInterleavingString[]   = {"BANK", "BOTH", "COL", "NONE"};
+
 
 /* Constant values for parsing config file */
 static const std::string VENDOR_STR = "vendor";

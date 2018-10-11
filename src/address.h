@@ -15,6 +15,7 @@ Released under the MIT License
 
 #include <bitset>
 #include <iostream>
+#include <sstream>
 #include "consts.h"
 
 class MappedAdd {
@@ -24,6 +25,7 @@ public:
     MappedAdd() = default;
     MappedAdd(unsigned long channel, unsigned long rank, unsigned long bank, unsigned long row, unsigned long col);
     void reset();
+    std::string to_string() const;
 };
 
 std::ostream& operator<<(std::ostream& ostr, MappedAdd& add);

@@ -42,6 +42,8 @@ public:
 
     CommandType getType() const;
     void setType(CommandType type);
+
+    std::string to_string() const;
 };
 
 std::ostream& operator<<(std::ostream& ostr, CommandType& cmdType);

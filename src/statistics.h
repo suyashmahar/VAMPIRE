@@ -165,6 +165,10 @@ public:
     std::shared_ptr<ScalarStat<double_t>>    avgPower;
     std::shared_ptr<ScalarStat<double_t>>    avgCurrent;
 
+    std::shared_ptr<VectorStat<uint64_t>>    rdInterleavingCount;   // One for each type of interleaving
+    std::shared_ptr<VectorStat<uint64_t>>    wrInterleavingCount;   // One for each type of interleaving
+
+
     explicit Statistics(Statistics &statistics) = default;
     explicit Statistics(uint64_t (&structCount)[int(Level::MAX)]);
     ~Statistics() = default;

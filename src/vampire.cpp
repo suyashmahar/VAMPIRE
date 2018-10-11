@@ -354,7 +354,8 @@ int Vampire::service_request(int encoded, Command cmd) {
                 cmdLength[static_cast<uint64_t>(cmdType)]*memClkSpeed*0.001+0.5); // +0.5 for rounding off
     };
 
-    this->currentTime = cmd.issueTime;
+    double cmdEnergy            = 0;
+    this->currentTime           = cmd.issueTime;
 
     /* Calculate # of cycles for idle state for the current bank */
     bool allBankPrecharged = true;
@@ -389,6 +390,10 @@ int Vampire::service_request(int encoded, Command cmd) {
     ss << "Request: " << commandString[int(cmd.type)] << " issueTime: " << cmd.issueTime <<  " Bank: " << cmd.add.bank << " Row: " << cmd.add.row << " Col: " << cmd.add.col;
     msg::info(ss.str());
 #endif
+
+    if (verboseMode) {
+        msg::info("Processing command: " + cmd.to_string());
+    }
 
     /* Calculate everything for the next request */
     // TODO: Refactor - split into multiple methods
@@ -426,9 +431,11 @@ int Vampire::service_request(int encoded, Command cmd) {
 
             cmdRdEnergy /= 2; // Current model uses the standard IDD4 loops which have RD/WR energies of two command
             if (structVar == StructVar::YES)
-                totalReadEnergy += cmdRdEnergy * equations->struct_var_power_adjustment(CommandType::RD, cmd.add);
+                cmdEnergy = cmdRdEnergy * equations->struct_var_power_adjustment(CommandType::RD, cmd.add);
             else
-                totalReadEnergy += cmdRdEnergy;
+                cmdEnergy = cmdRdEnergy;
+
+            totalReadEnergy += cmdEnergy;
 
             /* Update IO_buffer/Memory's state */
             if (traceType == TraceType::WR) {
@@ -469,10 +476,12 @@ int Vampire::service_request(int encoded, Command cmd) {
             cmdWriteEnergy /= 2; // Current model uses the standard IDD4 loops which have RD/WR energies of two command
 
             if (structVar == StructVar::YES) {
-                totalWriteEnergy += cmdWriteEnergy * equations->struct_var_power_adjustment(CommandType::WR, cmd.add);
+                cmdEnergy = cmdWriteEnergy * equations->struct_var_power_adjustment(CommandType::WR, cmd.add);
             } else {
-                totalWriteEnergy += cmdWriteEnergy;
+                cmdEnergy = cmdWriteEnergy;
             }
+
+            totalWriteEnergy += cmdEnergy;
 
             /* Update Memory and buffer*/
             if (traceType == TraceType::WR) {
@@ -504,11 +513,9 @@ int Vampire::service_request(int encoded, Command cmd) {
             dramStruct->banks->operator[](cmd.add.bank)->cmdEndTime = this->currentTime + cmdLengthInCycles(cmd.type);
             dramStruct->banks->operator[](cmd.add.bank)->actRowNum = cmd.add.row;
 
-            if (structVar == StructVar::NO) {
-                totalActCmdEnergy += dramSpec->actCmdEnergy;
-            } else {
-	            totalActCmdEnergy += dramSpec->actCmdEnergy;
-            }
+            cmdEnergy = dramSpec->actCmdEnergy;
+            totalActCmdEnergy += cmdEnergy;
+
             break;
         case (int(CommandType::PRE)):
             dramStruct->bankStates->operator[](cmd.add.bank) = State::CLOSE;
@@ -517,11 +524,9 @@ int Vampire::service_request(int encoded, Command cmd) {
             // Correct row address of the command since it isn't read from the trace for a PRE
             cmd.add.row = dramStruct->banks->operator[](cmd.add.bank)->actRowNum;
 
-            if (structVar == StructVar::NO) {
-	            totalPreCmdEnergy += dramSpec->preCmdEnergy;
-            } else {
-	            totalPreCmdEnergy += dramSpec->preCmdEnergy;
-            }
+            cmdEnergy = dramSpec->preCmdEnergy;
+            totalPreCmdEnergy += cmdEnergy;
+
             break;
         case (int(CommandType::PREA)):
         case (int(CommandType::REF)):
@@ -541,6 +546,9 @@ int Vampire::service_request(int encoded, Command cmd) {
 #ifdef DEBUG
     std::cout << ", cmdLengthInCycles: " << cmdLengthInCycles(cmd.type);
 #endif
+
+    if (verboseMode & cmd.type == CommandType::RD)
+        msg::info("Command energy: " + std::to_string(cmdEnergy));
     return 0;
 }
 

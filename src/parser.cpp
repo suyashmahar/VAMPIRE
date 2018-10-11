@@ -207,7 +207,7 @@ void AsciiParser::parse_data(uint32_t data[16]) {
 
 /* Command format:
  * 1. <timestamp>,<command>,<bank>
- * 2. <timestamp>,<command>,<bank>,<data>
+ * 2. <timestamp>,<command>,<bank>,<col>,<data>
  * 3. <timestamp>,ACT,<bank>,<rank>
  */
 // TODO: Make parsing simpler by parsing each command independently

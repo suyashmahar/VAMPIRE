@@ -93,6 +93,11 @@ void parse_args(int argc, char *argv[], Vampire &dram) {
             msg::info("Using parserType: " + std::string(argv[i+1]));
             dram.parserType = get_param<ParserType>(parserTypeString, argv[i + 1], "ParserType");
         }
+
+        if (strcmp(argv[i], "--verbose") == 0) {
+            msg::info("Verbose mode is now on (--verbose).");
+            dram.verboseMode = true;
+        }
     }
 }
 

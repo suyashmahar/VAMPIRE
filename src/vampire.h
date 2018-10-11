@@ -45,6 +45,7 @@ public:
     StructVar      structVar;         /* OPTIONS ARE NO, YES */
     TraceType      traceType;         /* OPTIONS ARE RATIO, DIST, WR, RD_WR */
     ParserType     parserType;        /* OPTIONS ARE BINARY, ASCII*/
+    bool           verboseMode = false;
 
     std::string *traceFilename = nullptr;
     std::string *configFilename = nullptr;

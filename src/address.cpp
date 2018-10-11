@@ -33,12 +33,18 @@ void MappedAdd::reset() {
     this->col = 0ul;
 }
 
+std::string MappedAdd::to_string() const {
+    std::stringstream ss;
+    ss << "chan: " << this->channel
+         << ", rank: " << this->rank
+         << ", bank: " << this->bank
+         << ", row: " << this->row
+         << ", col: " << this->col;
+    return ss.str();
+}
+
 std::ostream& operator<<(std::ostream& ostr, MappedAdd& add) {
-    ostr << "chan: " << add.channel
-         << ", rank: " << add.rank
-         << ", bank: " << add.bank
-         << ", row: " << add.row
-         << ", col: " << add.col;
+    ostr << add.to_string();
 }
 
 /***********************/
